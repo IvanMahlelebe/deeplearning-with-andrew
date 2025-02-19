@@ -1,0 +1,19 @@
+name: dl-specialisation
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.8
+  - numpy
+  - matplotlib
+  - tensorflow
+  - keras
+  - h5py
+  - opencv
+  - scikit-learn
+  - scipy
+  - pillow
+  - pip
+  - pip:
+      - notebook
+      - tqdm
