@@ -2,23 +2,21 @@ import numpy as np
 
 from NeuralCatClassifier.utilities import sigmoid
 
+import numpy as np
+
 class NeuralCatIdentifier:
-  def __init__(self, dim):
+  def __init__(self, dim, w_init=None, b_init=None):
     self.dim = dim
 
-    # already performing initialisation
-    self.w = np.zeros((self.dim, 1), dtype=float)
-    self.b = 0.0
+    self.w = np.zeros((self.dim, 1), dtype=float) if w_init is None else w_init
+    self.b = 0.0 if b_init is None else b_init
+    
     self.dw = np.zeros_like(self.w)
     self.db = 0.0 
-  
 
   def get_initialised_params(self):
     """
-      This function creates a vector of zeros of shape (dim, 1) for w and initializes b to 0.
-      
-      Argument:
-      dim -- size of the w vector we want (or number of parameters in this case)
+      This function returns the initialized parameters w and b.
       
       Returns:
       w -- initialized vector of shape (dim, 1)
@@ -51,13 +49,13 @@ class NeuralCatIdentifier:
     # forward passs
     z = np.dot(self.w.T, X) + self.b
     A = sigmoid(z)
-    cost = - (1/m) * np.sum(Y * np.log(A) + (1 - Y) * np.log(1 - A))
-    cost = np.squeeze(cost)
+    cost = - (1/m) * np.sum((Y * np.log(A) + (1 - Y) * np.log(1 - A)))
     
-    # backward pass - backward propagation
+    # backward pass - backpropagation
     dw = (1/m) * (np.dot(X, (A - Y).T))
     db = (1/m) * (np.sum(A - Y))
     
+    cost = np.squeeze(cost)
     grads = {
       "dw": dw,
       "db": db
@@ -91,7 +89,6 @@ class NeuralCatIdentifier:
     """
     
     costs = []
-    
     for i in range(num_iterations):
       grads, cost = self.propagate(X, Y)
       
@@ -136,13 +133,14 @@ class NeuralCatIdentifier:
     m = X.shape[1]
     Y_prediction = np.zeros((1,m))
     w = self.w.reshape(X.shape[0], 1)
-    A = sigmoid(np.dot(w.T,X) + self.b)
+    z = np.dot(w.T,X) + self.b
+    A = sigmoid(z)
     Y_prediction = (A >= 0.5) * 1.0
-    # assert(Y_prediction.shape == (1, m))
+    
     return Y_prediction
   
 
-  def run_model(self, X_train, Y_train, X_test, Y_test, num_iterations = 2000, learning_rate = 0.5, print_cost = False):
+  def run(self, X_train, Y_train, X_test, Y_test, num_iterations = 2000, learning_rate = 0.5, print_cost = False):
     """
       Builds the logistic regression model by calling the function you've implemented previously
       
@@ -158,10 +156,6 @@ class NeuralCatIdentifier:
       Returns:
       d -- dictionary containing information about the model.
     """
-    
-    
-    # initialize parameters with zeros
-    w, b = self.get_initialised_params()
     
     parameters, _, costs = self.optimize(
       X_train,
