@@ -270,3 +270,78 @@ class TestModel:
         atol=1e-8,
         err_msg=f"Incorrect gradient for {key}. Expected {expected_parameters[key]}; Got {updated_parameters[key]}"
       )
+
+  def test_train(self):
+    np.random.seed(1)
+
+    learning_rate = 1.02
+    X = np.random.randn(2, 3)
+    Y = (np.random.randn(1, 3) > 0)
+
+    model = PlanarClassifier()
+    model.set_layer_sizes(X, Y)
+    model.initialize_parameters()
+    updated_parameters, cost_updates = model.train(X, Y, learning_rate)
+
+    expected_cost0 = 0.692739
+    expected_parameters = {
+      'W1': np.array(
+        [
+          [-0.65400312,  1.21068652],
+          [-0.75688005,  1.38443617],
+          [ 0.57449374, -1.0957478 ],
+          [ 0.76242342, -1.40517716]
+        ]
+      ),
+      'b1': np.array(
+        [
+          [ 0.2841426 ],
+          [ 0.34699428],
+          [-0.23981061],
+          [-0.35351855]
+        ]
+      ),
+      'W2': np.array([[-2.42329584, -3.22274999, 1.97978376, 3.31771228]]),
+      'b2': np.array([[0.20282644]])
+    }
+
+    for key in expected_parameters:
+      np.testing.assert_allclose(
+        updated_parameters[key],
+        expected_parameters[key],
+        rtol=1e-8,
+        atol=1e-8,
+        err_msg=f"Incorrect value(s) for {key}. Expected {expected_parameters[key]}; Got {updated_parameters[key]}"
+      )
+    assert np.isclose(expected_cost0, cost_updates[0], rtol=1e-6), f"Incorrect: Expected {expected_cost0}; Got {cost_updates[0]}"
+
+  def test_predict(self):
+    np.random.seed(1)
+    X = np.random.randn(2, 3)
+    parameters = {
+      'W1': np.array(
+        [
+          [-0.00615039,  0.0169021 ],
+          [-0.02311792,  0.03137121],
+          [-0.0169217 , -0.01752545],
+          [ 0.00935436, -0.05018221]
+        ]),
+     'W2': np.array([[-0.0104319 , -0.04019007,  0.01607211,  0.04440255]]),
+     'b1': np.array(
+        [
+          [-8.97523455e-07],
+          [8.15562092e-06],
+          [6.04810633e-07],
+          [-2.54560700e-06]
+        ]),
+     'b2': np.array([[9.14954378e-05]])
+    }
+
+    model = PlanarClassifier()
+    model.set_parameters(parameters)
+    mean_model_predictions = np.mean(model.predict(X))
+
+    expected_mean_predictions = 0.6666666666666666
+
+    assert np.isclose(mean_model_predictions, expected_mean_predictions, rtol=1e-6), f"Incorrect: Expected {mean_model_predictions}; Got {expected_mean_predictions}"
+

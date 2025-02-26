@@ -176,3 +176,22 @@ class PlanarClassifier:
     }
 
     return updated_params
+
+  def train(self, X, Y, learning_rate, num_iterations = 10000) -> Tuple[dict, dict]:
+    
+    cost_updates = {}
+    for iteration in range(0, num_iterations):
+      A2, cache = self.forward_propagation(X)
+      cost = self.get_cost(A2, Y)
+      grads = self.backward_propagation(cache, X, Y)
+      updated_parameters = self.update_parameters(grads, learning_rate)
+      cost_updates[iteration] = cost
+
+    return updated_parameters, cost_updates
+
+  def predict(self, X):
+    if not self._parameters_initialized:
+      raise ValueError("Parameters not initialized.")
+    A2, _ = self.forward_propagation(X)
+    predictions = (A2 > 0.5)
+    return predictions
