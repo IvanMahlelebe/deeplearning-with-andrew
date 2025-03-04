@@ -10,13 +10,13 @@ from .activations import (
 
 class DeepNeuralNetwork:
 
-  def __init__(self, seed: int = 1):
-    self._seed = seed
+  def __init__(self):
+    self._seed = 42
     self._parameters: Dict[str, np.ndarray] = {}
     self._L: int = 0
     self._cache: Dict[str, Tuple[np.ndarray, ...]] = {}
 
-  def initialize_params(self, layer_dims: Tuple[int, ...]) -> None:
+  def initialize_params(self, layer_dims: Tuple[int, ...], seed: int = 42) -> None:
     """
       Initialises weights W with random values and biases b with 0s
 
@@ -26,6 +26,7 @@ class DeepNeuralNetwork:
       Returns:
         None
     """
+    self._seed = seed
     np.random.seed(self._seed)
     if len(layer_dims) < 2:
       raise ValueError("layer_dims must have at least two elements")
