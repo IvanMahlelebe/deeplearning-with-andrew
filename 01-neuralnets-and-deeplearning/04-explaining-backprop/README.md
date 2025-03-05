@@ -206,3 +206,29 @@ $$
     \end{aligned}
   \end{equation*}
 $$
+
+We have already seen that:
+$$
+\begin{equation*}
+  \begin{aligned}
+    \frac{\partial L}{\partial A^{[3]}}\cdot\frac{\partial A^{[3]}}{\partial Z^{[3]}} &= y^{(i)}-A^{[3]}\in\mathbb{R}^{1\times 1} \\
+    \frac{\partial Z^{[3]}}{\partial A^{[2]}} &= W^{[3]}\in\mathbb{R}^{1\times 2} \\
+    \frac{\partial A^{[2]}}{\partial Z^{[2]}} &= g^{[2]'}(Z^{[2]}) = g^{[2]}(Z^{[2]})(1-g^{[2]}(Z^{[2]})) \\
+    &= A^{[2]}(1-A^{[2]})\in\mathbb{R}^{2\times 1} \\
+    \frac{\partial Z^{[2]}}{\partial W^{[2]}} &= A^{[1]}\in\mathbb{R}^{3\times 1}
+  \end{aligned}
+\end{equation*}
+$$
+
+Now, putting it altogether, while also being mindful of mismatched shapes, we can conclude that:
+$$
+\begin{equation*}
+  \begin{aligned}
+    \frac{\partial J}{\partial W^{[2]}} = \frac{1}{m}\sum^m_{i=1}\frac{\partial L}{\partial W^{[2]}}
+    &= \left(y^{(i)} - A^{[3]}\right)W^{[3]}A^{[2]}(1-A^{[2]})A^{[1]} \\
+    &= W^{[3]T}A^{[2]}(1-A^{[2]})(y^{(i)} - A^{[3]})A^{[1]T}
+  \end{aligned}
+\end{equation*}
+$$
+
+The shapes of the terms above don't match correctly, so in our attempt to make them compatible, we also have remember that $\frac{\partial J}{\partial W^{[2]}}\in\mathbb{R}^{2\times 3}$ because of the dimensions of $W^{[2]}$, so it's much more convenient to do element-wise multiplication of $W^{[3]T}(A^{[2]}(1-A^{[2]}))^T$, this way we'll have the following dimensions: $(2, 1) (2, 1) (1, 1) (1, 3) = (2, 3)$.
