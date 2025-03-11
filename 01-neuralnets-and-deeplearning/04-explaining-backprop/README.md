@@ -75,7 +75,7 @@ If you look at our input layer above, you'll notice that the idea of one trainin
 
 **How does all this affect our propagation equations above??**<br>
 I'm glad you asked. Show's you're paying attention (*as my professor would say :D*). We'll it's easy. We'll modify it as follows:
-$$
+>$$
 \begin{equation*}
   \begin{aligned}
     Z^{[l]} &= W^{[l]} A^{[l-1]} + b^{[l]},\text{ where } W^{[l]}\in\mathbb{R}^{n_l\times n_{l-1}}, A^{[l-1]}\in\mathbb{R}^{n_{l-1}\times m}, b^{[l]}\in\mathbb{R}^{n_l\times 1}, Z^{[l]}\in\mathbb{R}^{n_l\times m} \\
@@ -232,3 +232,40 @@ $$
 $$
 
 The shapes of the terms above don't match correctly, so in our attempt to make them compatible, we also have remember that $\frac{\partial J}{\partial W^{[2]}}\in\mathbb{R}^{2\times 3}$ because of the dimensions of $W^{[2]}$, so it's much more convenient to do element-wise multiplication of $W^{[3]T}(A^{[2]}(1-A^{[2]}))^T$, this way we'll have the following dimensions: $(2, 1) (2, 1) (1, 1) (1, 3) = (2, 3)$.
+
+$$
+  \begin{equation*}
+    \begin{aligned}
+       \frac{\partial \mathcal{L}}{\partial W^{[1]}}
+      = \frac{\partial \mathcal{L}}{\partial A^{[3]}}\cdot
+        \frac{\partial A^{[3]}}{\partial Z^{[3]}}\cdot
+        \frac{\partial Z^{[3]}}{\partial A^{[2]}}\cdot
+        \frac{\partial A^{[2]}}{\partial Z^{[2]}}\cdot
+        \frac{\partial Z^{[2]}}{\partial A^{[1]}}\cdot
+        \frac{\partial A^{[1]}}{\partial Z^{[1]}}\cdot
+        \frac{\partial Z^{[1]}}{\partial W^{[1]}}
+    \end{aligned}
+  \end{equation*}
+$$
+
+The generalization of the backpropagation derivatives for an arbitrary multi-layer perceptron with $L$ layers can be written as follows:
+
+$$
+\frac{\partial \mathcal{L}}{\partial W^L} = \frac{\partial \mathcal{L}}{\partial A^L} \cdot \frac{\partial A^L}{\partial Z^L} \cdot \frac{\partial Z^L}{\partial W^L}
+$$
+
+$$
+\frac{\partial \mathcal{L}}{\partial W^{L-1}} = \frac{\partial \mathcal{L}}{\partial A^L} \cdot \frac{\partial A^L}{\partial Z^L} \cdot \frac{\partial Z^L}{\partial A^{L-1}} \cdot \frac{\partial A^{L-1}}{\partial Z^{L-1}} \cdot \frac{\partial Z^{L-1}}{\partial W^{L-1}}
+$$
+
+$$
+\frac{\partial \mathcal{L}}{\partial W^{L-2}} = \frac{\partial \mathcal{L}}{\partial A^L} \cdot \frac{\partial A^L}{\partial Z^L} \cdot \prod_{k=L}^{L-1} \left( \frac{\partial Z^k}{\partial A^k} \cdot \frac{\partial A^k}{\partial Z^k} \right) \cdot \frac{\partial Z^{L-2}}{\partial W^{L-2}}
+$$
+
+Generalizing this for any layer $L$, we get:
+
+>$$
+\frac{\partial \mathcal{L}}{\partial W^l} = \frac{\partial \mathcal{L}}{\partial A^L} \cdot \frac{\partial A^L}{\partial Z^L} \cdot \prod_{k=L}^{l+1} \left( \frac{\partial Z^k}{\partial A^k} \cdot \frac{\partial A^k}{\partial Z^k} \right) \cdot \frac{\partial Z^l}{\partial W^l}
+$$
+
+This formulation expresses the recursive nature of backpropagation, where errors propagate backward through the network by applying the chain rule repeatedly.B
