@@ -105,6 +105,7 @@ class TestDeepNeuralNetwork:
     SEED = 1
     np.random.seed(SEED)
     dnn = DeepNeuralNetwork(seed=SEED)
+    dnn.initialize_params((4, 3, 1))
 
     X = np.random.randn(4,2)
     W1 = np.random.randn(3,4)
@@ -122,4 +123,9 @@ class TestDeepNeuralNetwork:
     dnn.set_parameters(parameters)
     A = dnn.forward_propagation(X, activations)
 
-    assert (A.shape == (1,X.shape[1])), f"Incorrect. Expected {A.shape}; Got {1,X.shape[1]}"
+    expected_output_shape = (1, X.shape[1])
+    np.testing.assert_equal(
+      A.shape,
+      expected_output_shape,
+      f"Incorrect output shape. Expected {expected_output_shape}; Got {A.shape}"
+    )

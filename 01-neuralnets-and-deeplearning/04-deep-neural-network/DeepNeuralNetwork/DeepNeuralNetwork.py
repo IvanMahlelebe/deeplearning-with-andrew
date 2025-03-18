@@ -10,13 +10,13 @@ from .activations import (
 
 class DeepNeuralNetwork:
 
-  def __init__(self):
-    self._seed = 0
+  def __init__(self, seed: int = 42):
+    self._seed = seed
     self._parameters: Dict[str, np.ndarray] = {}
     self._L: int = 0
     self._cache: Dict[str, Tuple[np.ndarray, ...]] = {}
 
-  def initialize_params(self, layer_dims: Tuple[int, ...], seed: int = 42) -> None:
+  def initialize_params(self, layer_dims: Tuple[int, ...]) -> None:
     """
       Initialises weights W with random values and biases b with 0s
 
@@ -26,7 +26,6 @@ class DeepNeuralNetwork:
       Returns:
         None
     """
-    self._seed = seed
     np.random.seed(self._seed)
     if len(layer_dims) < 2:
       raise ValueError("layer_dims must have at least two elements")
@@ -56,7 +55,7 @@ class DeepNeuralNetwork:
     b: np.ndarray
   ) -> Tuple[np.ndarray, Tuple[np.ndarray]]:
     """
-    Computes the linear transformation Z = W * A_prev + b
+      Computes the linear transformation Z = W * A_prev + b
     """
     Z = np.dot(W, A_prev) + b
     linear_cache = (A_prev, W, b)
@@ -68,7 +67,7 @@ class DeepNeuralNetwork:
     activation: str
   ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Applies an activation function to Z.
+      Applies an activation function to Z.
     """
     if activation == "sigmoid":
       A, activation_cache = sigmoid(Z)
@@ -87,7 +86,7 @@ class DeepNeuralNetwork:
     activation: str
   ) -> Tuple[np.ndarray, Tuple[np.ndarray]]:
     """
-    Computes the forward pass for a single layer, including linear transformation and activation.
+      Computes the forward pass for a single layer, including linear transformation and activation.
     """
     Z, linear_cache = self._linear_forward(A_prev, W, b)
     A, activation_cache = self._activation_forward(Z, activation)
@@ -96,25 +95,40 @@ class DeepNeuralNetwork:
     return A, cache
   
   def forward_propagation(
-      self,
-      X: np.ndarray,
-      activations: Tuple[str, ...]
-    ) -> np.ndarray:
+    self,
+    X: np.ndarray,
+    activations: Tuple[str, ...]
+  ) -> np.ndarray:
     """
-    Implements forward propagation for the entire network.
+      Implements forward propagation for the entire network.
+
+      Args:
+        X: Input data of shape (n_features, n_examples).
+        activations: Tuple of activation functions for each layer (excluding the input layer).
+
+      Returns:
+        A: Output of the network after forward propagation.
     """
+    
+    # Input validation
+    # if not isinstance(X, np.ndarray):
+    #   raise ValueError("Input X must be a numpy array.")
+    # if len(activations) != self._L - 1:
+    #   raise ValueError(f"Expected {self._L - 1} activation functions{self._L}, got {len(activations)}.")
+    
     A = X
     self._cache = {}  # Reset cache
     
     for l in range(1, self._L):
+      A_prev = A
       W = self._parameters[f"W{l}"]
       b = self._parameters[f"b{l}"]
       activation = activations[l]
       
-      A, cache = self._linear_activation_forward(A, W, b, activation)
+      A, cache = self._linear_activation_forward(A_prev, W, b, activation)
       self._cache[f"layer{l}"] = cache
     
-    return A
+    return A # which is AL at this point
 
   def compute_cost(self, Y: np.ndarray) -> float:
     """
@@ -131,7 +145,7 @@ class DeepNeuralNetwork:
     linear_cache: Tuple[np.ndarray, np.ndarray, np.ndarray]
   ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Computes the gradients for the linear transformation.
+      Computes the gradients for the linear transformation.
     """
     A_prev, W, b = linear_cache
     m = A_prev.shape[1]
@@ -149,7 +163,7 @@ class DeepNeuralNetwork:
     activation: str
   ) -> np.ndarray:
     """
-    Computes the gradient of the cost with respect to Z.
+      Computes the gradient of the cost with respect to Z.
     """
     Z = activation_cache
 
@@ -169,7 +183,7 @@ class DeepNeuralNetwork:
     activation: str
   ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Computes the backward pass for a single layer, including linear transformation and activation.
+      Computes the backward pass for a single layer, including linear transformation and activation.
     """
     linear_cache, activation_cache = cache
 
@@ -184,7 +198,7 @@ class DeepNeuralNetwork:
     activations: Tuple[str, ...]
   ) -> Dict[str, np.ndarray]:
     """
-    Implements backward propagation for the entire network.
+      Implements backward propagation for the entire network.
     """
     grads = {}
     m = Y.shape[1]
